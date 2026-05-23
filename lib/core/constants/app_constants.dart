@@ -5,15 +5,16 @@ class AppConstants {
   static const String name = 'Sonu Kumar Paswan';
   static const String title = 'Senior Flutter Developer';
   static const String subtitle = 'Mobile App Architecture';
-  static const String location = 'India';
+  static const String location = 'Jamshedpur, Jharkhand India';
   static const String email = 'Krsonu12996@gmail.com';
   static const String phone = '+91-9525594153';
-  static const String linkedIn = 'https://linkedin.com/in/sonu-kumar-paswan';
-  static const String github = 'https://github.com/sonu-kumar-paswan';
+  static const String linkedIn =
+      'https://www.linkedin.com/in/sonu-kumar-paswan-immediate-joiner-83a451178/';
+  static const String github = 'https://github.com/krsonu12/';
   static const String yearsExperience = '5+';
-  static const String projectsDelivered = '10+';
+  static const String projectsDelivered = '20+';
   static const String crashFreeRate = '<0.1%';
-  static const String appsShipped = '5+';
+  static const String appsShipped = '10+';
 
   // Summary
   static const String summary =

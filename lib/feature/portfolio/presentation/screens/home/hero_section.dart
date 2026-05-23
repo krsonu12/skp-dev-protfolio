@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+
 import '../../../../../core/constants/app_constants.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/theme_ext.dart';
@@ -115,23 +116,23 @@ class HeroSection extends StatelessWidget {
 
         // Summary
         ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560),
+          constraints: const BoxConstraints(maxWidth: 960),
           child: Text(
             "I'm ${AppConstants.name} — a Senior Flutter Developer with "
             '${AppConstants.yearsExperience} years shipping production mobile applications. '
             'I specialise in clean architecture, reactive state management, and building '
             'scalable multi-module systems from greenfield to store release.',
-            style: Theme.of(context).textTheme.bodyLarge,
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
         ).animate().fadeIn(duration: 800.ms, delay: 600.ms),
 
         const SizedBox(height: 40),
 
         // Stats
-        Wrap(
+        const Wrap(
           spacing: 32,
           runSpacing: 16,
-          children: const [
+          children: [
             _StatItem(value: '5+', label: 'YEARS EXP'),
             _StatItem(value: '10+', label: 'PROJECTS'),
             _StatItem(value: '<0.1%', label: 'CRASH RATE'),
@@ -154,10 +155,10 @@ class HeroSection extends StatelessWidget {
         const SizedBox(height: 48),
 
         // Tech tags
-        Wrap(
+        const Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: const [
+          children: [
             SkillTag('Flutter'),
             SkillTag('Clean Architecture'),
             SkillTag('BLoC · Riverpod'),
