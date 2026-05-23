@@ -4,6 +4,7 @@ import '../../../../../core/constants/app_constants.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/theme_ext.dart';
 import '../../widgets/hover_region.dart';
+import '../../widgets/lottie_widget.dart';
 import '../../widgets/skill_tag.dart';
 
 class HeroSection extends StatelessWidget {
@@ -14,103 +15,163 @@ class HeroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final isNarrow = size.width < 700;
+    final isNarrow = size.width < 900;
 
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(minHeight: size.height),
       padding: EdgeInsets.symmetric(
         horizontal: isNarrow ? 24 : 80,
-        vertical: 120,
+        vertical: isNarrow ? 80 : 120,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'FLUTTER DEVELOPER · ${AppConstants.location.toUpperCase()}',
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: context.accentColor,
-                  letterSpacing: 2.5,
+      child: isNarrow ? _buildNarrow(context) : _buildWide(context),
+    );
+  }
+
+  // ── Wide layout: text left, Lottie right ──────────────────────────────────
+  Widget _buildWide(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(flex: 55, child: _buildTextContent(context)),
+        const SizedBox(width: 40),
+        Expanded(
+          flex: 45,
+          child: _buildLottie(context, size: 480),
+        ),
+      ],
+    );
+  }
+
+  // ── Narrow layout: Lottie top, text below ─────────────────────────────────
+  Widget _buildNarrow(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Center(child: _buildLottie(context, size: 260)),
+        const SizedBox(height: 32),
+        _buildTextContent(context),
+      ],
+    );
+  }
+
+  Widget _buildLottie(BuildContext context, {required double size}) {
+    return LottieWidget(
+      asset: LottieAssets.coding,
+      width: size,
+      height: size,
+      fit: BoxFit.contain,
+    )
+        .animate()
+        .fadeIn(duration: 1000.ms, delay: 300.ms)
+        .scale(begin: const Offset(0.92, 0.92), end: const Offset(1, 1));
+  }
+
+  Widget _buildTextContent(BuildContext context) {
+    final isNarrow = MediaQuery.of(context).size.width < 900;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Role label
+        Text(
+          'FLUTTER DEVELOPER · ${AppConstants.location.toUpperCase()}',
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: context.accentColor,
+                letterSpacing: 2.5,
+              ),
+        )
+            .animate()
+            .fadeIn(duration: 600.ms, delay: 200.ms)
+            .slideY(begin: 0.3, end: 0),
+
+        const SizedBox(height: 24),
+
+        // Headline
+        RichText(
+          text: TextSpan(
+            style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                  fontSize: isNarrow ? 38 : 64,
                 ),
-          )
-              .animate()
-              .fadeIn(duration: 600.ms, delay: 200.ms)
-              .slideY(begin: 0.3, end: 0),
-          const SizedBox(height: 24),
-          RichText(
-            text: TextSpan(
-              style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                    fontSize: isNarrow ? 42 : 72,
-                  ),
-              children: [
-                const TextSpan(text: 'Building apps\nthat '),
-                TextSpan(
-                  text: 'actually',
-                  style: TextStyle(
-                    color: context.accentColor,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-                const TextSpan(text: '\nwork.'),
-              ],
-            ),
-          )
-              .animate()
-              .fadeIn(duration: 800.ms, delay: 400.ms)
-              .slideY(begin: 0.2, end: 0),
-          const SizedBox(height: 32),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: Text(
-              "I'm ${AppConstants.name} — a Senior Flutter Developer with "
-              '${AppConstants.yearsExperience} years shipping production mobile applications. '
-              'I specialise in clean architecture, reactive state management, and building '
-              'scalable multi-module systems from greenfield to store release.',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          ).animate().fadeIn(duration: 800.ms, delay: 600.ms),
-          const SizedBox(height: 48),
-          Wrap(
-            spacing: 40,
-            runSpacing: 16,
-            children: const [
-              _StatItem(value: '5+', label: 'YEARS EXPERIENCE'),
-              _StatItem(value: '10+', label: 'PROJECTS DELIVERED'),
-              _StatItem(value: '<0.1%', label: 'CRASH-FREE RATE'),
-              _StatItem(value: '3', label: 'DEVS MENTORED'),
-            ],
-          ).animate().fadeIn(duration: 800.ms, delay: 800.ms),
-          const SizedBox(height: 56),
-          Wrap(
-            spacing: 16,
-            runSpacing: 12,
             children: [
-              _CtaButton(label: 'View Work', onTap: onCtaTap, filled: true),
-              _CtaButton(
-                  label: 'Get in touch →', onTap: onCtaTap, filled: false),
+              const TextSpan(text: 'Building apps\nthat '),
+              TextSpan(
+                text: 'actually',
+                style: TextStyle(
+                  color: context.accentColor,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              const TextSpan(text: '\nwork.'),
             ],
-          ).animate().fadeIn(duration: 600.ms, delay: 1000.ms),
-          const SizedBox(height: 64),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: const [
-              SkillTag('Flutter'),
-              SkillTag('Clean Architecture'),
-              SkillTag('BLoC · Riverpod'),
-              SkillTag('Firebase'),
-              SkillTag('AWS'),
-              SkillTag('CI/CD'),
-            ],
-          ).animate().fadeIn(duration: 600.ms, delay: 1200.ms),
-        ],
-      ),
+          ),
+        )
+            .animate()
+            .fadeIn(duration: 800.ms, delay: 400.ms)
+            .slideY(begin: 0.2, end: 0),
+
+        const SizedBox(height: 28),
+
+        // Summary
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 560),
+          child: Text(
+            "I'm ${AppConstants.name} — a Senior Flutter Developer with "
+            '${AppConstants.yearsExperience} years shipping production mobile applications. '
+            'I specialise in clean architecture, reactive state management, and building '
+            'scalable multi-module systems from greenfield to store release.',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ).animate().fadeIn(duration: 800.ms, delay: 600.ms),
+
+        const SizedBox(height: 40),
+
+        // Stats
+        Wrap(
+          spacing: 32,
+          runSpacing: 16,
+          children: const [
+            _StatItem(value: '5+', label: 'YEARS EXP'),
+            _StatItem(value: '10+', label: 'PROJECTS'),
+            _StatItem(value: '<0.1%', label: 'CRASH RATE'),
+            _StatItem(value: '3', label: 'MENTORED'),
+          ],
+        ).animate().fadeIn(duration: 800.ms, delay: 800.ms),
+
+        const SizedBox(height: 48),
+
+        // CTA buttons
+        Wrap(
+          spacing: 16,
+          runSpacing: 12,
+          children: [
+            _CtaButton(label: 'View Work', onTap: onCtaTap, filled: true),
+            _CtaButton(label: 'Get in touch', onTap: onCtaTap, filled: false),
+          ],
+        ).animate().fadeIn(duration: 600.ms, delay: 1000.ms),
+
+        const SizedBox(height: 48),
+
+        // Tech tags
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: const [
+            SkillTag('Flutter'),
+            SkillTag('Clean Architecture'),
+            SkillTag('BLoC · Riverpod'),
+            SkillTag('Firebase'),
+            SkillTag('AWS'),
+            SkillTag('CI/CD'),
+          ],
+        ).animate().fadeIn(duration: 600.ms, delay: 1200.ms),
+      ],
     );
   }
 }
 
-// ── Stat item ────────────────────────────────────────────────────────────────
+// ── Stat item ─────────────────────────────────────────────────────────────────
 
 class _StatItem extends StatelessWidget {
   const _StatItem({required this.value, required this.label});
@@ -127,16 +188,17 @@ class _StatItem extends StatelessWidget {
           value,
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
                 color: context.accentColor,
-                fontSize: 32,
+                fontSize: 28,
                 fontWeight: FontWeight.w800,
               ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Text(
           label,
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: context.mutedText,
                 letterSpacing: 1.5,
+                fontSize: 10,
               ),
         ),
       ],
@@ -144,7 +206,7 @@ class _StatItem extends StatelessWidget {
   }
 }
 
-// ── CTA button — hover via HoverRegion, zero setState ────────────────────────
+// ── CTA button ────────────────────────────────────────────────────────────────
 
 class _CtaButton extends StatelessWidget {
   const _CtaButton({

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../../core/constants/app_constants.dart';
 import '../../../../../core/theme/theme_ext.dart';
 import '../../widgets/animated_section.dart';
 import '../../widgets/hover_region.dart';
+import '../../widgets/lottie_widget.dart';
 import '../../widgets/section_label.dart';
 
 class ContactSection extends StatelessWidget {
@@ -52,24 +54,18 @@ class ContactSection extends StatelessWidget {
         children: [
           const SectionLabel('CONTACT'),
           const SizedBox(height: 32),
+
+          // ── Headline + Lottie ─────────────────────────────────────
           AnimatedSection(
             key: const ValueKey('contact-headline'),
-            child: RichText(
-              text: TextSpan(
-                style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                      fontSize: isNarrow ? 28 : 40,
-                    ),
-                children: [
-                  const TextSpan(text: "Let's build\n"),
-                  TextSpan(
-                    text: 'something worth building.',
-                    style: TextStyle(color: context.accentColor),
-                  ),
-                ],
-              ),
-            ),
+            child: isNarrow
+                ? _buildNarrowHeader(context)
+                : _buildWideHeader(context),
           ),
+
           const SizedBox(height: 32),
+
+          // ── Sub-text ──────────────────────────────────────────────
           AnimatedSection(
             key: const ValueKey('contact-sub'),
             child: ConstrainedBox(
@@ -84,7 +80,10 @@ class ContactSection extends StatelessWidget {
               ),
             ),
           ),
+
           const SizedBox(height: 56),
+
+          // ── Action buttons ────────────────────────────────────────
           AnimatedSection(
             key: const ValueKey('contact-links'),
             child: Wrap(
@@ -92,29 +91,36 @@ class ContactSection extends StatelessWidget {
               runSpacing: 12,
               children: [
                 _ContactButton(
-                  label: '✉️ EMAIL →',
+                  label: 'EMAIL',
+                  icon: Icons.email_outlined,
                   onTap: () => _launch('mailto:${AppConstants.email}'),
                   filled: true,
                 ),
                 _ContactButton(
                   label: 'COPY EMAIL',
+                  icon: Icons.copy_outlined,
                   onTap: () => _copyEmail(context),
                   filled: false,
                 ),
                 _ContactButton(
-                  label: '🐙 GITHUB →',
+                  label: 'GITHUB',
+                  icon: Icons.code,
                   onTap: () => _launch(AppConstants.github),
                   filled: false,
                 ),
                 _ContactButton(
-                  label: '💼 LINKEDIN →',
+                  label: 'LINKEDIN',
+                  icon: Icons.work_outline,
                   onTap: () => _launch(AppConstants.linkedIn),
                   filled: false,
                 ),
               ],
             ),
           ),
+
           const SizedBox(height: 80),
+
+          // ── Footer ────────────────────────────────────────────────
           AnimatedSection(
             key: const ValueKey('footer'),
             child: Column(
@@ -136,18 +142,86 @@ class ContactSection extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildWideHeader(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                    fontSize: 40,
+                  ),
+              children: [
+                const TextSpan(text: "Let's build\n"),
+                TextSpan(
+                  text: 'something worth building.',
+                  style: TextStyle(color: context.accentColor),
+                ),
+              ],
+            ),
+          ),
+        ),
+        // Waving hello Lottie
+        LottieWidget(
+          asset: LottieAssets.hello,
+          width: 200,
+          height: 200,
+          repeat: true,
+        )
+            .animate()
+            .fadeIn(duration: 800.ms, delay: 300.ms)
+            .scale(begin: const Offset(0.85, 0.85), end: const Offset(1, 1)),
+      ],
+    );
+  }
+
+  Widget _buildNarrowHeader(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Lottie above headline on narrow
+        Center(
+          child: LottieWidget(
+            asset: LottieAssets.hello,
+            width: 140,
+            height: 140,
+            repeat: true,
+          ).animate().fadeIn(duration: 800.ms),
+        ),
+        const SizedBox(height: 24),
+        RichText(
+          text: TextSpan(
+            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                  fontSize: 28,
+                ),
+            children: [
+              const TextSpan(text: "Let's build\n"),
+              TextSpan(
+                text: 'something worth building.',
+                style: TextStyle(color: context.accentColor),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }
 
-// ── Contact button — hover via HoverRegion, zero setState ────────────────────
+// ── Contact button ────────────────────────────────────────────────────────────
 
 class _ContactButton extends StatelessWidget {
   const _ContactButton({
     required this.label,
+    required this.icon,
     required this.onTap,
     required this.filled,
   });
 
   final String label;
+  final IconData icon;
   final VoidCallback onTap;
   final bool filled;
 
@@ -156,11 +230,14 @@ class _ContactButton extends StatelessWidget {
     return HoverRegion(
       builder: (context, ref, hovered) {
         final accent = context.accentColor;
+        final fgColor = filled
+            ? context.bgColor
+            : (hovered ? accent : context.secondaryText);
         return GestureDetector(
           onTap: onTap,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
               color: filled
                   ? (hovered ? accent.withValues(alpha: 0.85) : accent)
@@ -172,14 +249,19 @@ class _ContactButton extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(4),
             ),
-            child: Text(
-              label,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: filled
-                        ? context.bgColor
-                        : (hovered ? accent : context.secondaryText),
-                    letterSpacing: 1.5,
-                  ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 14, color: fgColor),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: fgColor,
+                        letterSpacing: 1.5,
+                      ),
+                ),
+              ],
             ),
           ),
         );

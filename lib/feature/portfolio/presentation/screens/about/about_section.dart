@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 import '../../../../../core/constants/app_constants.dart';
 import '../../../../../core/theme/theme_ext.dart';
 import '../../widgets/animated_section.dart';
+import '../../widgets/lottie_widget.dart';
 import '../../widgets/section_label.dart';
 import '../../widgets/skill_tag.dart';
 
@@ -41,24 +44,45 @@ class AboutSection extends StatelessWidget {
         children: [
           const SectionLabel('ABOUT'),
           const SizedBox(height: 32),
+
+          // ── Headline with Lottie rocket accent ──────────────────────
           AnimatedSection(
             key: const ValueKey('about-headline'),
-            child: RichText(
-              text: TextSpan(
-                style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                      fontSize: isNarrow ? 28 : 40,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: RichText(
+                    text: TextSpan(
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                            fontSize: isNarrow ? 28 : 40,
+                          ),
+                      children: [
+                        const TextSpan(text: 'Flutter engineer.\n'),
+                        TextSpan(
+                          text: 'Problem solver.',
+                          style: TextStyle(color: context.accentColor),
+                        ),
+                      ],
                     ),
-                children: [
-                  const TextSpan(text: 'Flutter engineer.\n'),
-                  TextSpan(
-                    text: 'Problem solver.',
-                    style: TextStyle(color: context.accentColor),
                   ),
-                ],
-              ),
+                ),
+                // Rocket Lottie — plays once on scroll-in
+                LottieWidget(
+                  asset: LottieAssets.rocket,
+                  width: isNarrow ? 90 : 130,
+                  height: isNarrow ? 90 : 130,
+                  repeat: false,
+                )
+                    .animate()
+                    .fadeIn(duration: 600.ms, delay: 400.ms)
+                    .slideX(begin: 0.2, end: 0),
+              ],
             ),
           ),
+
           const SizedBox(height: 48),
+
           if (isNarrow)
             _buildNarrowLayout(context)
           else
@@ -96,17 +120,21 @@ class AboutSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppConstants.summary,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(fontSize: 17, height: 1.8)),
+          Text(
+            AppConstants.summary,
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge
+                ?.copyWith(fontSize: 17, height: 1.8),
+          ),
           const SizedBox(height: 24),
-          Text(AppConstants.summaryExtra,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(fontSize: 17, height: 1.8)),
+          Text(
+            AppConstants.summaryExtra,
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge
+                ?.copyWith(fontSize: 17, height: 1.8),
+          ),
           const SizedBox(height: 24),
           Text(
             'I hold a Bachelor of Computer Applications (BCA) from Shri Krishna University, '

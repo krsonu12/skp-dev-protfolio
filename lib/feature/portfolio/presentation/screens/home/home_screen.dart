@@ -13,7 +13,7 @@ import '../skills/skills_section.dart';
 import 'hero_section.dart';
 
 // ---------------------------------------------------------------------------
-// Section keys — module-level constants, survive rebuilds
+// Section keys — module-level so they survive widget rebuilds
 // ---------------------------------------------------------------------------
 final _heroKey = GlobalKey();
 final _aboutKey = GlobalKey();
@@ -22,29 +22,19 @@ final _projectsKey = GlobalKey();
 final _skillsKey = GlobalKey();
 final _contactKey = GlobalKey();
 
-/// Ordered list matching nav indices 0-4.
 final _sectionKeys = [
-  _aboutKey,
-  _experienceKey,
-  _projectsKey,
-  _skillsKey,
-  _contactKey,
+  _aboutKey, // index 0 → ABOUT
+  _experienceKey, // index 1 → EXPERIENCE
+  _projectsKey, // index 2 → PROJECTS
+  _skillsKey, // index 3 → SKILLS
+  _contactKey, // index 4 → CONTACT
 ];
 
 // ---------------------------------------------------------------------------
-// Providers — scoped to this screen
-// ---------------------------------------------------------------------------
-
-/// Single ScrollController instance, disposed with the provider.
-final _scrollControllerProvider = Provider.autoDispose<ScrollController>((ref) {
-  final controller = ScrollController();
-  ref.onDispose(controller.dispose);
-  return controller;
-});
-
-// ---------------------------------------------------------------------------
-// HomeScreen — ConsumerStatefulWidget so the scroll listener is attached
-// exactly once in initState and torn down in dispose. Zero setState.
+// HomeScreen
+// ConsumerStatefulWidget: scroll listener attached once in initState,
+// ScrollController owned by State (not a provider) so it is never disposed
+// by a theme change mid-animation. Zero setState.
 // ---------------------------------------------------------------------------
 @RoutePage()
 class HomeScreen extends ConsumerStatefulWidget {
@@ -55,60 +45,73 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  late final ScrollController _scrollController;
+  // Owned here — created once, disposed once, survives theme rebuilds.
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    // Read (not watch) so we don't rebuild when the controller changes.
-    _scrollController = ref.read(_scrollControllerProvider);
     _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
     super.dispose();
   }
 
-  /// Determines which section is currently in view by comparing each
-  /// section's absolute offset in the scroll content against the current
-  /// scroll position. Uses [RenderBox.localToGlobal] with the scroll
-  /// viewport's render object as the ancestor so we get content-relative
-  /// coordinates, not screen-relative ones.
   void _onScroll() {
-    final scrollOffset = _scrollController.offset;
+    if (!_scrollController.hasClients) return;
 
-    // Walk sections from bottom to top; first one whose top is above the
-    // "active threshold" (100 px from viewport top) wins.
-    for (var i = _sectionKeys.length - 1; i >= 0; i--) {
+    final scrollOffset = _scrollController.offset;
+    const threshold = 120.0;
+
+    // Find the RenderBox of the scroll viewport to use as ancestor,
+    // so localToGlobal gives us coordinates relative to the viewport origin
+    // (not the screen). This makes the math correct regardless of where
+    // the Scaffold sits on screen.
+    final scrollCtx = _scrollController.position.context.storageContext;
+    final viewportBox = scrollCtx.findRenderObject() as RenderBox?;
+
+    int activeIndex = -1;
+
+    for (var i = 0; i < _sectionKeys.length; i++) {
       final ctx = _sectionKeys[i].currentContext;
       if (ctx == null) continue;
       final box = ctx.findRenderObject() as RenderBox?;
       if (box == null || !box.attached) continue;
 
-      // Get the section's top position relative to the scroll content,
-      // not the screen — subtract the current scroll offset from the
-      // screen-relative dy to get the content-relative position.
-      final screenDy = box.localToGlobal(Offset.zero).dy;
-      final contentTop = screenDy + scrollOffset;
+      // Position relative to the viewport widget — this gives us the
+      // section's current on-screen Y. Adding scrollOffset converts it
+      // to the section's absolute Y in the scroll content.
+      final localDy = viewportBox != null
+          ? box.localToGlobal(Offset.zero, ancestor: viewportBox).dy
+          : box.localToGlobal(Offset.zero).dy;
+      final absoluteTop = localDy + scrollOffset;
 
-      if (scrollOffset + 120 >= contentTop) {
-        final current = ref.read(activeSectionProvider);
-        if (current != i) {
-          ref.read(activeSectionProvider.notifier).state = i;
-        }
-        return;
+      // A section is "active" if its top has passed the threshold line.
+      if (absoluteTop <= scrollOffset + threshold) {
+        activeIndex = i; // keep updating — last one that qualifies wins
       }
     }
 
-    // Above all sections — deselect.
-    if (ref.read(activeSectionProvider) != -1) {
-      ref.read(activeSectionProvider.notifier).state = -1;
+    if (ref.read(activeSectionProvider) != activeIndex) {
+      ref.read(activeSectionProvider.notifier).state = activeIndex;
     }
   }
 
   void _scrollToSection(int index) {
+    if (!_scrollController.hasClients) return;
+
+    // Immediately highlight the tapped tab — don't wait for scroll to settle.
+    if (index >= 0 && index < _sectionKeys.length) {
+      ref.read(activeSectionProvider.notifier).state = index;
+    } else if (index == -1) {
+      ref.read(activeSectionProvider.notifier).state = -1;
+    }
+
     if (index == -1) {
       _scrollController.animateTo(
         0,
@@ -117,6 +120,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
       return;
     }
+
     if (index < _sectionKeys.length) {
       final ctx = _sectionKeys[index].currentContext;
       if (ctx != null) {
@@ -139,7 +143,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: context.bgColor,
       body: Stack(
         children: [
-          // ── Scrollable content ────────────────────────────────────────
+          // ── Scrollable content ──────────────────────────────────────
           SingleChildScrollView(
             controller: _scrollController,
             child: Column(
@@ -196,7 +200,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // ── Sticky nav bar ────────────────────────────────────────────
+          // ── Sticky nav bar ──────────────────────────────────────────
           Positioned(
             top: 0,
             left: 0,

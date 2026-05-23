@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class SkillCategoryEntity {
   const SkillCategoryEntity({
     required this.category,
@@ -6,6 +8,6 @@ class SkillCategoryEntity {
   });
 
   final String category;
-  final String icon;
+  final IconData icon;
   final List<String> skills;
 }

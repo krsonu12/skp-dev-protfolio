@@ -98,7 +98,7 @@ class _ProjectCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(
-            child: Text(project.emoji, style: const TextStyle(fontSize: 24)),
+            child: Icon(project.icon, color: context.accentColor, size: 24),
           ),
         ),
         const SizedBox(width: 32),
@@ -113,7 +113,7 @@ class _ProjectCard extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(project.emoji, style: const TextStyle(fontSize: 24)),
+            Icon(project.icon, color: context.accentColor, size: 24),
             const SizedBox(width: 12),
             Expanded(
               child: Text(

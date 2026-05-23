@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import '../../domain/entities/experience_entity.dart';
 import '../../domain/entities/portfolio_entity.dart';
 import '../../domain/entities/project_entity.dart';
@@ -15,6 +16,7 @@ class PortfolioLocalDataSource {
     );
   }
 
+  // ── Experiences ────────────────────────────────────────────────────────────
   static const List<ExperienceEntity> _experiences = [
     ExperienceEntity(
       company: 'Webskitters Technology Solutions Pvt. Ltd.',
@@ -70,9 +72,10 @@ class PortfolioLocalDataSource {
     ),
   ];
 
+  // ── Projects ───────────────────────────────────────────────────────────────
   static const List<ProjectEntity> _projects = [
     ProjectEntity(
-      emoji: '🏷️',
+      icon: Icons.label_outline,
       title: 'White-Label Community Platform SDK',
       description:
           'A multi-tenant SDK enabling 10+ client brands to ship customized community apps from a single Flutter codebase.',
@@ -84,7 +87,7 @@ class PortfolioLocalDataSource {
       ],
     ),
     ProjectEntity(
-      emoji: '🏥',
+      icon: Icons.local_hospital_outlined,
       title: 'AI-Powered Healthcare Document Reader',
       description:
           'Flutter app integrating AWS Textract + NLP models for automated healthcare form extraction and patient auto-enrollment.',
@@ -96,7 +99,7 @@ class PortfolioLocalDataSource {
       ],
     ),
     ProjectEntity(
-      emoji: '🚚',
+      icon: Icons.local_shipping_outlined,
       title: 'Multi-Modal Logistics Scanner App',
       description:
           'Production logistics app for multi-modal transport with real-time tracking, QR/barcode scanning, and CI/CD automation.',
@@ -109,7 +112,7 @@ class PortfolioLocalDataSource {
       storeRating: '4.5+',
     ),
     ProjectEntity(
-      emoji: '🛒',
+      icon: Icons.shopping_cart_outlined,
       title: 'Food-Tech & E-Commerce Suite',
       description:
           'Suite of 5+ production apps across food-tech and e-commerce with cart, checkout, loyalty rewards, and payment integrations.',
@@ -122,10 +125,11 @@ class PortfolioLocalDataSource {
     ),
   ];
 
+  // ── Skill categories ───────────────────────────────────────────────────────
   static const List<SkillCategoryEntity> _skillCategories = [
     SkillCategoryEntity(
       category: 'Architecture',
-      icon: '🏗️',
+      icon: Icons.account_tree_outlined,
       skills: [
         'Clean Architecture',
         'Feature-First Modularization',
@@ -136,12 +140,12 @@ class PortfolioLocalDataSource {
     ),
     SkillCategoryEntity(
       category: 'State Management',
-      icon: '⚡',
+      icon: Icons.bolt_outlined,
       skills: ['BLoC', 'MobX + GetIt', 'Riverpod', 'Provider', 'GetX'],
     ),
     SkillCategoryEntity(
       category: 'Networking',
-      icon: '🌐',
+      icon: Icons.language_outlined,
       skills: [
         'REST APIs',
         'Dio + Retrofit',
@@ -152,7 +156,7 @@ class PortfolioLocalDataSource {
     ),
     SkillCategoryEntity(
       category: 'Backend / Cloud',
-      icon: '☁️',
+      icon: Icons.cloud_outlined,
       skills: [
         'Firebase (Firestore, Auth, FCM, Crashlytics)',
         'Supabase',
@@ -163,7 +167,7 @@ class PortfolioLocalDataSource {
     ),
     SkillCategoryEntity(
       category: 'CI/CD & DevOps',
-      icon: '🚀',
+      icon: Icons.rocket_launch_outlined,
       skills: [
         'GitHub Actions',
         'Codemagic',
@@ -174,7 +178,7 @@ class PortfolioLocalDataSource {
     ),
     SkillCategoryEntity(
       category: 'Testing',
-      icon: '🧪',
+      icon: Icons.science_outlined,
       skills: [
         'Unit & Widget Tests',
         'Integration Tests',
@@ -185,7 +189,7 @@ class PortfolioLocalDataSource {
     ),
     SkillCategoryEntity(
       category: 'Data & Storage',
-      icon: '🗄️',
+      icon: Icons.storage_outlined,
       skills: [
         'Hive',
         'SQLite (sqflite)',
@@ -196,7 +200,7 @@ class PortfolioLocalDataSource {
     ),
     SkillCategoryEntity(
       category: 'Tooling',
-      icon: '🛠️',
+      icon: Icons.build_outlined,
       skills: [
         'Flutter & Dart',
         'Git / GitHub / GitLab',
@@ -207,6 +211,7 @@ class PortfolioLocalDataSource {
     ),
   ];
 
+  // ── Highlights ─────────────────────────────────────────────────────────────
   static const List<String> _highlights = [
     'Modular Monorepo Design with melos — shared domain, data, and feature packages enabling parallel team development.',
     'State Management Philosophy — BLoC for event-driven logic, MobX+GetIt for service-locator patterns, Riverpod for fine-grained reactivity.',
