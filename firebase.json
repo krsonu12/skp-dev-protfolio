@@ -1,1 +1,22 @@
-{"flutter":{"platforms":{"dart":{"lib/firebase_options.dart":{"projectId":"skp-dev-portfolio","configurations":{"web":"1:618548211079:web:26216cf27164ed3cb4b722"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "skp-dev-portfolio",
+          "configurations": {
+            "web": "1:618548211079:web:26216cf27164ed3cb4b722"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "n",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
