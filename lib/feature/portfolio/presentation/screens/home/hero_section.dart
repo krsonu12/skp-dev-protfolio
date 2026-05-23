@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../../core/constants/app_constants.dart';
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/theme_ext.dart';
 import '../../widgets/skill_tag.dart';
 
 class HeroSection extends StatelessWidget {
@@ -25,59 +26,51 @@ class HeroSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Role label
           Text(
             'FLUTTER DEVELOPER · ${AppConstants.location.toUpperCase()}',
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: AppColors.accent,
+                  color: context.accentColor,
                   letterSpacing: 2.5,
                 ),
           )
               .animate()
               .fadeIn(duration: 600.ms, delay: 200.ms)
               .slideY(begin: 0.3, end: 0),
-
           const SizedBox(height: 24),
-
-          // Main headline
           RichText(
             text: TextSpan(
               style: Theme.of(context).textTheme.displayLarge?.copyWith(
                     fontSize: isNarrow ? 42 : 72,
                   ),
-              children: const [
-                TextSpan(text: 'Building apps\nthat '),
+              children: [
+                const TextSpan(text: 'Building apps\nthat '),
                 TextSpan(
                   text: 'actually',
                   style: TextStyle(
-                    color: AppColors.accent,
+                    color: context.accentColor,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
-                TextSpan(text: '\nwork.'),
+                const TextSpan(text: '\nwork.'),
               ],
             ),
           )
               .animate()
               .fadeIn(duration: 800.ms, delay: 400.ms)
               .slideY(begin: 0.2, end: 0),
-
           const SizedBox(height: 32),
-
-          // Summary
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 600),
             child: Text(
-              "I'm ${AppConstants.name} — a Senior Flutter Developer with ${AppConstants.yearsExperience} years shipping production mobile applications. "
-              'I specialise in clean architecture, reactive state management, and building scalable multi-module systems from greenfield to store release.',
+              "I'm ${AppConstants.name} — a Senior Flutter Developer with "
+              '${AppConstants.yearsExperience} years shipping production mobile applications. '
+              'I specialise in clean architecture, reactive state management, and building '
+              'scalable multi-module systems from greenfield to store release.',
               style: Theme.of(context).textTheme.bodyLarge,
             ),
           ).animate().fadeIn(duration: 800.ms, delay: 600.ms),
-
           const SizedBox(height: 48),
-
-          // Stats row
-          const Wrap(
+          Wrap(
             spacing: 40,
             runSpacing: 16,
             children: const [
@@ -87,30 +80,17 @@ class HeroSection extends StatelessWidget {
               _StatItem(value: '3', label: 'DEVS MENTORED'),
             ],
           ).animate().fadeIn(duration: 800.ms, delay: 800.ms),
-
           const SizedBox(height: 56),
-
-          // CTA buttons
           Wrap(
             spacing: 16,
             runSpacing: 12,
             children: [
+              _CtaButton(label: 'View Work', onTap: onCtaTap, filled: true),
               _CtaButton(
-                label: 'View Work',
-                onTap: onCtaTap,
-                filled: true,
-              ),
-              _CtaButton(
-                label: 'Get in touch →',
-                onTap: onCtaTap,
-                filled: false,
-              ),
+                  label: 'Get in touch →', onTap: onCtaTap, filled: false),
             ],
           ).animate().fadeIn(duration: 600.ms, delay: 1000.ms),
-
           const SizedBox(height: 64),
-
-          // Tech tags
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -143,7 +123,7 @@ class _StatItem extends StatelessWidget {
         Text(
           value,
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: AppColors.accent,
+                color: context.accentColor,
                 fontSize: 32,
                 fontWeight: FontWeight.w800,
               ),
@@ -152,7 +132,7 @@ class _StatItem extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: AppColors.textMuted,
+                color: context.mutedText,
                 letterSpacing: 1.5,
               ),
         ),
@@ -181,6 +161,8 @@ class _CtaButtonState extends State<_CtaButton> {
 
   @override
   Widget build(BuildContext context) {
+    final accent = context.accentColor;
+
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
@@ -192,12 +174,12 @@ class _CtaButtonState extends State<_CtaButton> {
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
           decoration: BoxDecoration(
             color: widget.filled
-                ? (_hovered ? AppColors.accentDim : AppColors.accent)
+                ? (_hovered ? AppColors.accentDim : accent)
                 : Colors.transparent,
             border: Border.all(
               color: widget.filled
                   ? Colors.transparent
-                  : (_hovered ? AppColors.accent : AppColors.border),
+                  : (_hovered ? accent : context.borderColor),
             ),
             borderRadius: BorderRadius.circular(4),
           ),
@@ -205,8 +187,8 @@ class _CtaButtonState extends State<_CtaButton> {
             widget.label,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: widget.filled
-                      ? AppColors.background
-                      : (_hovered ? AppColors.accent : AppColors.textSecondary),
+                      ? context.bgColor
+                      : (_hovered ? accent : context.secondaryText),
                   fontWeight: FontWeight.w600,
                 ),
           ),

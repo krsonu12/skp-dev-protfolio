@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/theme_ext.dart';
 import '../../../domain/entities/skill_category_entity.dart';
 import '../../widgets/animated_section.dart';
 import '../../widgets/section_label.dart';
@@ -25,8 +25,8 @@ class SkillsSection extends StatelessWidget {
         horizontal: isNarrow ? 24 : 80,
         vertical: 100,
       ),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: context.borderColor)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,27 +43,21 @@ class SkillsSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 64),
-
-          // Skill grid
           AnimatedSection(
             key: const ValueKey('skills-grid'),
             child: _buildGrid(context, isNarrow, isMedium),
           ),
-
           const SizedBox(height: 80),
-
-          // Architecture highlights
           const SectionLabel('ARCHITECTURE & ENGINEERING HIGHLIGHTS'),
           const SizedBox(height: 32),
           AnimatedSection(
             key: const ValueKey('highlights'),
             child: Column(
-              children: highlights.asMap().entries.map((entry) {
-                return _HighlightItem(
-                  text: entry.value,
-                  index: entry.key,
-                );
-              }).toList(),
+              children: highlights
+                  .asMap()
+                  .entries
+                  .map((e) => _HighlightItem(text: e.value, index: e.key))
+                  .toList(),
             ),
           ),
         ],
@@ -73,7 +67,6 @@ class SkillsSection extends StatelessWidget {
 
   Widget _buildGrid(BuildContext context, bool isNarrow, bool isMedium) {
     final crossAxisCount = isNarrow ? 1 : (isMedium ? 2 : 4);
-
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -84,9 +77,8 @@ class SkillsSection extends StatelessWidget {
         childAspectRatio: isNarrow ? 3 : 1.2,
       ),
       itemCount: skillCategories.length,
-      itemBuilder: (context, index) {
-        return _SkillCategoryCard(category: skillCategories[index]);
-      },
+      itemBuilder: (context, index) =>
+          _SkillCategoryCard(category: skillCategories[index]),
     );
   }
 }
@@ -106,6 +98,7 @@ class _SkillCategoryCardState extends State<_SkillCategoryCard> {
   @override
   Widget build(BuildContext context) {
     final cat = widget.category;
+    final accent = context.accentColor;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -114,11 +107,10 @@ class _SkillCategoryCardState extends State<_SkillCategoryCard> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: _hovered ? AppColors.surfaceElevated : AppColors.surface,
+          color: _hovered ? context.surfaceElevatedColor : context.surfaceColor,
           border: Border.all(
-            color: _hovered
-                ? AppColors.accent.withValues(alpha: 0.3)
-                : AppColors.border,
+            color:
+                _hovered ? accent.withValues(alpha: 0.3) : context.borderColor,
           ),
         ),
         child: Column(
@@ -129,8 +121,7 @@ class _SkillCategoryCardState extends State<_SkillCategoryCard> {
             Text(
               cat.category.toUpperCase(),
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color:
-                        _hovered ? AppColors.accent : AppColors.textSecondary,
+                    color: _hovered ? accent : context.secondaryText,
                     letterSpacing: 1.5,
                     fontSize: 11,
                   ),
@@ -142,7 +133,6 @@ class _SkillCategoryCardState extends State<_SkillCategoryCard> {
                 child: Text(
                   s,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
                         fontSize: 13,
                       ),
                 ),
@@ -163,7 +153,6 @@ class _HighlightItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Split on first em-dash or colon to get title vs body
     final colonIdx = text.indexOf(' — ');
     final hasTitle = colonIdx != -1;
     final title = hasTitle ? text.substring(0, colonIdx) : '';
@@ -171,20 +160,19 @@ class _HighlightItem extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 1),
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 0),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.border)),
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: context.borderColor)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Index
           SizedBox(
             width: 40,
             child: Text(
               '0${index + 1}',
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: AppColors.textMuted,
+                    color: context.mutedText,
                   ),
             ),
           ),
@@ -197,23 +185,19 @@ class _HighlightItem extends StatelessWidget {
                       children: [
                         TextSpan(
                           text: '$title — ',
-                          style: const TextStyle(
-                            color: AppColors.textPrimary,
+                          style: TextStyle(
+                            color: context.primaryText,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         TextSpan(
                           text: body,
-                          style:
-                              const TextStyle(color: AppColors.textSecondary),
+                          style: TextStyle(color: context.secondaryText),
                         ),
                       ],
                     ),
                   )
-                : Text(
-                    body,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
+                : Text(body, style: Theme.of(context).textTheme.bodyLarge),
           ),
         ],
       ),

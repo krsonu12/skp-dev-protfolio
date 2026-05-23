@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/constants/app_constants.dart';
-import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/theme_ext.dart';
 import '../../widgets/animated_section.dart';
 import '../../widgets/section_label.dart';
 import '../../widgets/skill_tag.dart';
@@ -33,8 +33,8 @@ class AboutSection extends StatelessWidget {
         horizontal: isNarrow ? 24 : 80,
         vertical: 100,
       ),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: context.borderColor)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,11 +48,11 @@ class AboutSection extends StatelessWidget {
                 style: Theme.of(context).textTheme.displaySmall?.copyWith(
                       fontSize: isNarrow ? 28 : 40,
                     ),
-                children: const [
-                  TextSpan(text: 'Flutter engineer.\n'),
+                children: [
+                  const TextSpan(text: 'Flutter engineer.\n'),
                   TextSpan(
                     text: 'Problem solver.',
-                    style: TextStyle(color: AppColors.accent),
+                    style: TextStyle(color: context.accentColor),
                   ),
                 ],
               ),
@@ -96,31 +96,27 @@ class AboutSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppConstants.summary,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontSize: 17,
-                  height: 1.8,
-                ),
-          ),
+          Text(AppConstants.summary,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(fontSize: 17, height: 1.8)),
           const SizedBox(height: 24),
-          Text(
-            AppConstants.summaryExtra,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontSize: 17,
-                  height: 1.8,
-                ),
-          ),
+          Text(AppConstants.summaryExtra,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(fontSize: 17, height: 1.8)),
           const SizedBox(height: 24),
           Text(
             'I hold a Bachelor of Computer Applications (BCA) from Shri Krishna University, '
             'Chattarpur, MP (2018–2021). Outside of code, I care deeply about developer '
             'experience — enforcing quality, automating repetitive tasks, documenting '
             'architectural decisions, and growing junior engineers.',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontSize: 17,
-                  height: 1.8,
-                ),
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge
+                ?.copyWith(fontSize: 17, height: 1.8),
           ),
         ],
       ),

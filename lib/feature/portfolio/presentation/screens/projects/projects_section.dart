@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/theme_ext.dart';
 import '../../../domain/entities/project_entity.dart';
 import '../../widgets/animated_section.dart';
 import '../../widgets/section_label.dart';
@@ -20,8 +20,8 @@ class ProjectsSection extends StatelessWidget {
         horizontal: isNarrow ? 24 : 80,
         vertical: 100,
       ),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: context.borderColor)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,15 +38,13 @@ class ProjectsSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 64),
-          ...projects.asMap().entries.map((entry) {
-            return AnimatedSection(
-              key: ValueKey('proj-${entry.key}'),
-              child: _ProjectCard(
-                project: entry.value,
-                isNarrow: isNarrow,
-              ),
-            );
-          }),
+          ...projects.asMap().entries.map((entry) => AnimatedSection(
+                key: ValueKey('proj-${entry.key}'),
+                child: _ProjectCard(
+                  project: entry.value,
+                  isNarrow: isNarrow,
+                ),
+              )),
         ],
       ),
     );
@@ -78,9 +76,9 @@ class _ProjectCardState extends State<_ProjectCard> {
         margin: const EdgeInsets.only(bottom: 2),
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
-          color: _hovered ? AppColors.surfaceElevated : Colors.transparent,
+          color: _hovered ? context.surfaceElevatedColor : Colors.transparent,
           border: Border.all(
-            color: _hovered ? AppColors.border : Colors.transparent,
+            color: _hovered ? context.borderColor : Colors.transparent,
           ),
           borderRadius: BorderRadius.circular(8),
         ),
@@ -94,12 +92,11 @@ class _ProjectCardState extends State<_ProjectCard> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Emoji icon
         Container(
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            color: AppColors.tagBg,
+            color: context.tagBgColor,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(
@@ -125,7 +122,7 @@ class _ProjectCardState extends State<_ProjectCard> {
                 p.title,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color:
-                          _hovered ? AppColors.accent : AppColors.textPrimary,
+                          _hovered ? context.accentColor : context.primaryText,
                     ),
               ),
             ),
@@ -137,11 +134,10 @@ class _ProjectCardState extends State<_ProjectCard> {
     );
   }
 
-  Widget _buildContent(
-    BuildContext context,
-    ProjectEntity p, {
-    bool hideTitle = false,
-  }) {
+  Widget _buildContent(BuildContext context, ProjectEntity p,
+      {bool hideTitle = false}) {
+    final accent = context.accentColor;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -152,8 +148,7 @@ class _ProjectCardState extends State<_ProjectCard> {
                 child: Text(
                   p.title,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color:
-                            _hovered ? AppColors.accent : AppColors.textPrimary,
+                        color: _hovered ? accent : context.primaryText,
                       ),
                 ),
               ),
@@ -162,20 +157,20 @@ class _ProjectCardState extends State<_ProjectCard> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.tagBg,
+                    color: context.tagBgColor,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.star, color: AppColors.accent, size: 12),
+                      Icon(Icons.star, color: accent, size: 12),
                       const SizedBox(width: 4),
                       Text(
                         p.storeRating!,
-                        style:
-                            Theme.of(context).textTheme.labelMedium?.copyWith(
-                                  color: AppColors.accent,
-                                ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelMedium
+                            ?.copyWith(color: accent),
                       ),
                     ],
                   ),
@@ -186,12 +181,9 @@ class _ProjectCardState extends State<_ProjectCard> {
         ],
         Text(
           p.description,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
-              ),
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: 16),
-        // Bullets
         ...p.bullets.map(
           (b) => Padding(
             padding: const EdgeInsets.only(bottom: 8),
@@ -203,24 +195,20 @@ class _ProjectCardState extends State<_ProjectCard> {
                   child: Container(
                     width: 4,
                     height: 4,
-                    decoration: const BoxDecoration(
-                      color: AppColors.accent,
+                    decoration: BoxDecoration(
+                      color: accent,
                       shape: BoxShape.circle,
                     ),
                   ),
                 ),
                 Expanded(
-                  child: Text(
-                    b,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                  child: Text(b, style: Theme.of(context).textTheme.bodyMedium),
                 ),
               ],
             ),
           ),
         ),
         const SizedBox(height: 16),
-        // Tags
         Wrap(
           spacing: 8,
           runSpacing: 8,

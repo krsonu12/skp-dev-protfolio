@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/theme_ext.dart';
 import '../../../domain/entities/experience_entity.dart';
 import '../../widgets/animated_section.dart';
 import '../../widgets/section_label.dart';
 
 class ExperienceSection extends StatelessWidget {
-  const ExperienceSection({
-    super.key,
-    required this.experiences,
-  });
+  const ExperienceSection({super.key, required this.experiences});
 
   final List<ExperienceEntity> experiences;
 
@@ -22,8 +19,8 @@ class ExperienceSection extends StatelessWidget {
         horizontal: isNarrow ? 24 : 80,
         vertical: 100,
       ),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: context.borderColor)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,15 +37,13 @@ class ExperienceSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 64),
-          ...experiences.asMap().entries.map((entry) {
-            return AnimatedSection(
-              key: ValueKey('exp-${entry.key}'),
-              child: _ExperienceCard(
-                experience: entry.value,
-                isNarrow: isNarrow,
-              ),
-            );
-          }),
+          ...experiences.asMap().entries.map((entry) => AnimatedSection(
+                key: ValueKey('exp-${entry.key}'),
+                child: _ExperienceCard(
+                  experience: entry.value,
+                  isNarrow: isNarrow,
+                ),
+              )),
         ],
       ),
     );
@@ -56,10 +51,7 @@ class ExperienceSection extends StatelessWidget {
 }
 
 class _ExperienceCard extends StatefulWidget {
-  const _ExperienceCard({
-    required this.experience,
-    required this.isNarrow,
-  });
+  const _ExperienceCard({required this.experience, required this.isNarrow});
 
   final ExperienceEntity experience;
   final bool isNarrow;
@@ -83,9 +75,9 @@ class _ExperienceCardState extends State<_ExperienceCard> {
         margin: const EdgeInsets.only(bottom: 2),
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
-          color: _hovered ? AppColors.surfaceElevated : Colors.transparent,
+          color: _hovered ? context.surfaceElevatedColor : Colors.transparent,
           border: Border.all(
-            color: _hovered ? AppColors.border : Colors.transparent,
+            color: _hovered ? context.borderColor : Colors.transparent,
           ),
           borderRadius: BorderRadius.circular(8),
         ),
@@ -100,19 +92,17 @@ class _ExperienceCardState extends State<_ExperienceCard> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Period column
         SizedBox(
           width: 180,
           child: Text(
             exp.period,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: AppColors.textMuted,
+                  color: context.mutedText,
                   letterSpacing: 0.5,
                 ),
           ),
         ),
         const SizedBox(width: 40),
-        // Content
         Expanded(child: _buildContent(context, exp)),
       ],
     );
@@ -125,7 +115,7 @@ class _ExperienceCardState extends State<_ExperienceCard> {
         Text(
           exp.period,
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: AppColors.textMuted,
+                color: context.mutedText,
                 letterSpacing: 0.5,
               ),
         ),
@@ -136,31 +126,31 @@ class _ExperienceCardState extends State<_ExperienceCard> {
   }
 
   Widget _buildContent(BuildContext context, ExperienceEntity exp) {
+    final accent = context.accentColor;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Role
         Text(
           exp.role,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: _hovered ? AppColors.accent : AppColors.textPrimary,
+                color: _hovered ? accent : context.primaryText,
               ),
         ),
         const SizedBox(height: 4),
-        // Company
         Row(
           children: [
             Text(
               exp.company,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.secondaryText,
                     fontWeight: FontWeight.w500,
                   ),
             ),
             Text(
               ' · ${exp.location}',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textMuted,
+                    color: context.mutedText,
                   ),
             ),
           ],
@@ -170,20 +160,19 @@ class _ExperienceCardState extends State<_ExperienceCard> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.tagBg,
+              color: context.tagBgColor,
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
               exp.projectName!,
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: AppColors.accent,
+                    color: context.tagTextColor,
                     letterSpacing: 0.3,
                   ),
             ),
           ),
         ],
         const SizedBox(height: 20),
-        // Bullets
         ...exp.bullets.map(
           (b) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
@@ -195,17 +184,14 @@ class _ExperienceCardState extends State<_ExperienceCard> {
                   child: Container(
                     width: 4,
                     height: 4,
-                    decoration: const BoxDecoration(
-                      color: AppColors.accent,
+                    decoration: BoxDecoration(
+                      color: accent,
                       shape: BoxShape.circle,
                     ),
                   ),
                 ),
                 Expanded(
-                  child: Text(
-                    b,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                  child: Text(b, style: Theme.of(context).textTheme.bodyMedium),
                 ),
               ],
             ),

@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/theme_ext.dart';
 import '../../shared_providers/portfolio_providers.dart';
 import '../../widgets/nav_bar.dart';
 import '../about/about_section.dart';
@@ -111,7 +111,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final state = ref.watch(portfolioNotifierProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.bgColor,
       body: Stack(
         children: [
           // Main scrollable content
@@ -194,11 +194,11 @@ class _LoadingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
+    return SizedBox(
       height: 200,
       child: Center(
         child: CircularProgressIndicator(
-          color: AppColors.accent,
+          color: context.accentColor,
           strokeWidth: 1.5,
         ),
       ),

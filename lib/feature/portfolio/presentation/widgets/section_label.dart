@@ -8,10 +8,11 @@ class SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Text(
       '— $label',
       style: Theme.of(context).textTheme.labelLarge?.copyWith(
-            color: AppColors.accent,
+            color: isDark ? AppColors.accentDark : AppColors.accent,
             letterSpacing: 2,
           ),
     );
