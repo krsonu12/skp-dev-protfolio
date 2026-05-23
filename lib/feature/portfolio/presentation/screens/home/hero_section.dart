@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../../core/constants/app_constants.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/theme_ext.dart';
+import '../../widgets/hover_region.dart';
 import '../../widgets/skill_tag.dart';
 
 class HeroSection extends StatelessWidget {
@@ -109,6 +110,8 @@ class HeroSection extends StatelessWidget {
   }
 }
 
+// ── Stat item ────────────────────────────────────────────────────────────────
+
 class _StatItem extends StatelessWidget {
   const _StatItem({required this.value, required this.label});
 
@@ -141,7 +144,9 @@ class _StatItem extends StatelessWidget {
   }
 }
 
-class _CtaButton extends StatefulWidget {
+// ── CTA button — hover via HoverRegion, zero setState ────────────────────────
+
+class _CtaButton extends StatelessWidget {
   const _CtaButton({
     required this.label,
     required this.onTap,
@@ -153,47 +158,38 @@ class _CtaButton extends StatefulWidget {
   final bool filled;
 
   @override
-  State<_CtaButton> createState() => _CtaButtonState();
-}
-
-class _CtaButtonState extends State<_CtaButton> {
-  bool _hovered = false;
-
-  @override
   Widget build(BuildContext context) {
-    final accent = context.accentColor;
-
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-          decoration: BoxDecoration(
-            color: widget.filled
-                ? (_hovered ? AppColors.accentDim : accent)
-                : Colors.transparent,
-            border: Border.all(
-              color: widget.filled
-                  ? Colors.transparent
-                  : (_hovered ? accent : context.borderColor),
+    return HoverRegion(
+      builder: (context, ref, hovered) {
+        final accent = context.accentColor;
+        return GestureDetector(
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+            decoration: BoxDecoration(
+              color: filled
+                  ? (hovered ? AppColors.accentDim : accent)
+                  : Colors.transparent,
+              border: Border.all(
+                color: filled
+                    ? Colors.transparent
+                    : (hovered ? accent : context.borderColor),
+              ),
+              borderRadius: BorderRadius.circular(4),
             ),
-            borderRadius: BorderRadius.circular(4),
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: filled
+                        ? context.bgColor
+                        : (hovered ? accent : context.secondaryText),
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
           ),
-          child: Text(
-            widget.label,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: widget.filled
-                      ? context.bgColor
-                      : (_hovered ? accent : context.secondaryText),
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

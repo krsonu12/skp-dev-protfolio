@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/theme_ext.dart';
 import '../../../domain/entities/skill_category_entity.dart';
 import '../../widgets/animated_section.dart';
+import '../../widgets/hover_region.dart';
 import '../../widgets/section_label.dart';
 
 class SkillsSection extends StatelessWidget {
@@ -83,67 +84,64 @@ class SkillsSection extends StatelessWidget {
   }
 }
 
-class _SkillCategoryCard extends StatefulWidget {
+// ── Skill card — hover via HoverRegion, zero setState ────────────────────────
+
+class _SkillCategoryCard extends StatelessWidget {
   const _SkillCategoryCard({required this.category});
 
   final SkillCategoryEntity category;
 
   @override
-  State<_SkillCategoryCard> createState() => _SkillCategoryCardState();
-}
-
-class _SkillCategoryCardState extends State<_SkillCategoryCard> {
-  bool _hovered = false;
-
-  @override
   Widget build(BuildContext context) {
-    final cat = widget.category;
-    final accent = context.accentColor;
-
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: _hovered ? context.surfaceElevatedColor : context.surfaceColor,
-          border: Border.all(
+    return HoverRegion(
+      cursor: MouseCursor.defer,
+      builder: (context, ref, hovered) {
+        final accent = context.accentColor;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
             color:
-                _hovered ? accent.withValues(alpha: 0.3) : context.borderColor,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(cat.icon, style: const TextStyle(fontSize: 24)),
-            const SizedBox(height: 12),
-            Text(
-              cat.category.toUpperCase(),
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: _hovered ? accent : context.secondaryText,
-                    letterSpacing: 1.5,
-                    fontSize: 11,
-                  ),
+                hovered ? context.surfaceElevatedColor : context.surfaceColor,
+            border: Border.all(
+              color:
+                  hovered ? accent.withValues(alpha: 0.3) : context.borderColor,
             ),
-            const SizedBox(height: 12),
-            ...cat.skills.map(
-              (s) => Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Text(
-                  s,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontSize: 13,
-                      ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(category.icon, style: const TextStyle(fontSize: 24)),
+              const SizedBox(height: 12),
+              Text(
+                category.category.toUpperCase(),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: hovered ? accent : context.secondaryText,
+                      letterSpacing: 1.5,
+                      fontSize: 11,
+                    ),
+              ),
+              const SizedBox(height: 12),
+              ...category.skills.map(
+                (s) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Text(
+                    s,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 13,
+                        ),
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
+
+// ── Highlight row ─────────────────────────────────────────────────────────────
 
 class _HighlightItem extends StatelessWidget {
   const _HighlightItem({required this.text, required this.index});

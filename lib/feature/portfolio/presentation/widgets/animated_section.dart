@@ -1,41 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-class AnimatedSection extends StatefulWidget {
+/// Fades + slides in when scrolled into view.
+/// Uses [ValueNotifier] — zero [setState].
+class AnimatedSection extends StatelessWidget {
   const AnimatedSection({
     super.key,
     required this.child,
-    this.delay = Duration.zero,
   });
 
   final Widget child;
-  final Duration delay;
-
-  @override
-  State<AnimatedSection> createState() => _AnimatedSectionState();
-}
-
-class _AnimatedSectionState extends State<AnimatedSection> {
-  bool _visible = false;
 
   @override
   Widget build(BuildContext context) {
+    // Each instance gets its own notifier via the key.
+    final visible = ValueNotifier<bool>(false);
+
     return VisibilityDetector(
-      key: widget.key ?? UniqueKey(),
+      key: key ?? UniqueKey(),
       onVisibilityChanged: (info) {
-        if (info.visibleFraction > 0.1 && !_visible) {
-          setState(() => _visible = true);
+        if (info.visibleFraction > 0.1 && !visible.value) {
+          visible.value = true;
         }
       },
-      child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 600),
-        opacity: _visible ? 1.0 : 0.0,
-        child: AnimatedSlide(
-          duration: const Duration(milliseconds: 600),
-          offset: _visible ? Offset.zero : const Offset(0, 0.05),
-          curve: Curves.easeOutCubic,
-          child: widget.child,
-        ),
+      child: ValueListenableBuilder<bool>(
+        valueListenable: visible,
+        builder: (context, isVisible, _) {
+          return AnimatedOpacity(
+            duration: const Duration(milliseconds: 600),
+            opacity: isVisible ? 1.0 : 0.0,
+            child: AnimatedSlide(
+              duration: const Duration(milliseconds: 600),
+              offset: isVisible ? Offset.zero : const Offset(0, 0.05),
+              curve: Curves.easeOutCubic,
+              child: child,
+            ),
+          );
+        },
       ),
     );
   }

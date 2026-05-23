@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../../core/constants/app_constants.dart';
 import '../../../../../core/theme/theme_ext.dart';
 import '../../widgets/animated_section.dart';
+import '../../widgets/hover_region.dart';
 import '../../widgets/section_label.dart';
 
 class ContactSection extends StatelessWidget {
@@ -137,7 +138,9 @@ class ContactSection extends StatelessWidget {
   }
 }
 
-class _ContactButton extends StatefulWidget {
+// ── Contact button — hover via HoverRegion, zero setState ────────────────────
+
+class _ContactButton extends StatelessWidget {
   const _ContactButton({
     required this.label,
     required this.onTap,
@@ -149,49 +152,38 @@ class _ContactButton extends StatefulWidget {
   final bool filled;
 
   @override
-  State<_ContactButton> createState() => _ContactButtonState();
-}
-
-class _ContactButtonState extends State<_ContactButton> {
-  bool _hovered = false;
-
-  @override
   Widget build(BuildContext context) {
-    final accent = context.accentColor;
-
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          decoration: BoxDecoration(
-            color: widget.filled
-                ? (_hovered
-                    ? context.accentColor.withValues(alpha: 0.85)
-                    : accent)
-                : Colors.transparent,
-            border: Border.all(
-              color: widget.filled
-                  ? Colors.transparent
-                  : (_hovered ? accent : context.borderColor),
+    return HoverRegion(
+      builder: (context, ref, hovered) {
+        final accent = context.accentColor;
+        return GestureDetector(
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+            decoration: BoxDecoration(
+              color: filled
+                  ? (hovered ? accent.withValues(alpha: 0.85) : accent)
+                  : Colors.transparent,
+              border: Border.all(
+                color: filled
+                    ? Colors.transparent
+                    : (hovered ? accent : context.borderColor),
+              ),
+              borderRadius: BorderRadius.circular(4),
             ),
-            borderRadius: BorderRadius.circular(4),
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: filled
+                        ? context.bgColor
+                        : (hovered ? accent : context.secondaryText),
+                    letterSpacing: 1.5,
+                  ),
+            ),
           ),
-          child: Text(
-            widget.label,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: widget.filled
-                      ? context.bgColor
-                      : (_hovered ? accent : context.secondaryText),
-                  letterSpacing: 1.5,
-                ),
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

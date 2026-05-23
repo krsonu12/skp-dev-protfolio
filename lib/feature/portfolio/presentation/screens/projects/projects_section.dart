@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/theme_ext.dart';
 import '../../../domain/entities/project_entity.dart';
 import '../../widgets/animated_section.dart';
+import '../../widgets/hover_region.dart';
 import '../../widgets/section_label.dart';
 import '../../widgets/skill_tag.dart';
 
@@ -38,57 +39,54 @@ class ProjectsSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 64),
-          ...projects.asMap().entries.map((entry) => AnimatedSection(
-                key: ValueKey('proj-${entry.key}'),
-                child: _ProjectCard(
-                  project: entry.value,
-                  isNarrow: isNarrow,
+          ...projects.asMap().entries.map(
+                (entry) => AnimatedSection(
+                  key: ValueKey('proj-${entry.key}'),
+                  child: _ProjectCard(
+                    project: entry.value,
+                    isNarrow: isNarrow,
+                  ),
                 ),
-              )),
+              ),
         ],
       ),
     );
   }
 }
 
-class _ProjectCard extends StatefulWidget {
+// ── Card — hover via HoverRegion, zero setState ───────────────────────────────
+
+class _ProjectCard extends StatelessWidget {
   const _ProjectCard({required this.project, required this.isNarrow});
 
   final ProjectEntity project;
   final bool isNarrow;
 
   @override
-  State<_ProjectCard> createState() => _ProjectCardState();
-}
-
-class _ProjectCardState extends State<_ProjectCard> {
-  bool _hovered = false;
-
-  @override
   Widget build(BuildContext context) {
-    final p = widget.project;
-
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.only(bottom: 2),
-        padding: const EdgeInsets.all(32),
-        decoration: BoxDecoration(
-          color: _hovered ? context.surfaceElevatedColor : Colors.transparent,
-          border: Border.all(
-            color: _hovered ? context.borderColor : Colors.transparent,
+    return HoverRegion(
+      cursor: MouseCursor.defer,
+      builder: (context, ref, hovered) {
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.only(bottom: 2),
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: hovered ? context.surfaceElevatedColor : Colors.transparent,
+            border: Border.all(
+              color: hovered ? context.borderColor : Colors.transparent,
+            ),
+            borderRadius: BorderRadius.circular(8),
           ),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child:
-            widget.isNarrow ? _buildNarrow(context, p) : _buildWide(context, p),
-      ),
+          child: isNarrow
+              ? _buildNarrow(context, hovered)
+              : _buildWide(context, hovered),
+        );
+      },
     );
   }
 
-  Widget _buildWide(BuildContext context, ProjectEntity p) {
+  Widget _buildWide(BuildContext context, bool hovered) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -100,42 +98,45 @@ class _ProjectCardState extends State<_ProjectCard> {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(
-            child: Text(p.emoji, style: const TextStyle(fontSize: 24)),
+            child: Text(project.emoji, style: const TextStyle(fontSize: 24)),
           ),
         ),
         const SizedBox(width: 32),
-        Expanded(child: _buildContent(context, p)),
+        Expanded(child: _buildContent(context, hovered)),
       ],
     );
   }
 
-  Widget _buildNarrow(BuildContext context, ProjectEntity p) {
+  Widget _buildNarrow(BuildContext context, bool hovered) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text(p.emoji, style: const TextStyle(fontSize: 24)),
+            Text(project.emoji, style: const TextStyle(fontSize: 24)),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                p.title,
+                project.title,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color:
-                          _hovered ? context.accentColor : context.primaryText,
+                          hovered ? context.accentColor : context.primaryText,
                     ),
               ),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        _buildContent(context, p, hideTitle: true),
+        _buildContent(context, hovered, hideTitle: true),
       ],
     );
   }
 
-  Widget _buildContent(BuildContext context, ProjectEntity p,
-      {bool hideTitle = false}) {
+  Widget _buildContent(
+    BuildContext context,
+    bool hovered, {
+    bool hideTitle = false,
+  }) {
     final accent = context.accentColor;
 
     return Column(
@@ -146,13 +147,13 @@ class _ProjectCardState extends State<_ProjectCard> {
             children: [
               Expanded(
                 child: Text(
-                  p.title,
+                  project.title,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: _hovered ? accent : context.primaryText,
+                        color: hovered ? accent : context.primaryText,
                       ),
                 ),
               ),
-              if (p.storeRating != null)
+              if (project.storeRating != null)
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -166,7 +167,7 @@ class _ProjectCardState extends State<_ProjectCard> {
                       Icon(Icons.star, color: accent, size: 12),
                       const SizedBox(width: 4),
                       Text(
-                        p.storeRating!,
+                        project.storeRating!,
                         style: Theme.of(context)
                             .textTheme
                             .labelMedium
@@ -180,11 +181,11 @@ class _ProjectCardState extends State<_ProjectCard> {
           const SizedBox(height: 8),
         ],
         Text(
-          p.description,
+          project.description,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: 16),
-        ...p.bullets.map(
+        ...project.bullets.map(
           (b) => Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(
@@ -202,7 +203,10 @@ class _ProjectCardState extends State<_ProjectCard> {
                   ),
                 ),
                 Expanded(
-                  child: Text(b, style: Theme.of(context).textTheme.bodyMedium),
+                  child: Text(
+                    b,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ),
               ],
             ),
@@ -212,7 +216,7 @@ class _ProjectCardState extends State<_ProjectCard> {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: p.tags.map((t) => SkillTag(t, small: true)).toList(),
+          children: project.tags.map((t) => SkillTag(t, small: true)).toList(),
         ),
       ],
     );

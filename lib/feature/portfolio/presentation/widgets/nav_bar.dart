@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_ext.dart';
 import '../../../../core/theme/theme_notifier.dart';
+import 'hover_region.dart';
 
 class PortfolioNavBar extends ConsumerWidget {
   const PortfolioNavBar({
@@ -24,36 +27,30 @@ class PortfolioNavBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isNarrow = MediaQuery.of(context).size.width < 700;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    // Adaptive nav bar colors
+    final isDark = context.isDark;
+    final accentColor = context.accentColor;
     final bgColor = isDark
         ? AppColors.background.withValues(alpha: 0.95)
         : AppColors.lightBackground.withValues(alpha: 0.97);
-    final accentColor = isDark ? AppColors.accentDark : AppColors.accent;
-    final textColor =
-        isDark ? AppColors.textSecondary : AppColors.lightTextSecondary;
-    final borderColor = isDark ? AppColors.border : AppColors.lightBorder;
 
     return Container(
       decoration: BoxDecoration(
         color: bgColor,
-        border: Border(
-          bottom: BorderSide(color: borderColor),
-        ),
+        border: Border(bottom: BorderSide(color: context.borderColor)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
       child: Row(
         children: [
           // Logo
-          GestureDetector(
-            onTap: () => onTap(-1),
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
+          HoverRegion(
+            builder: (context, ref, hovered) => GestureDetector(
+              onTap: () => onTap(-1),
               child: Text(
-                'SKP',
+                'Sonu Kumar Paswan',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: accentColor,
+                      color: hovered
+                          ? accentColor.withValues(alpha: 0.7)
+                          : accentColor,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 2,
                     ),
@@ -70,17 +67,18 @@ class PortfolioNavBar extends ConsumerWidget {
                 final isActive = activeIndex == item.$2;
                 return Padding(
                   padding: const EdgeInsets.only(left: 32),
-                  child: GestureDetector(
-                    onTap: () => onTap(item.$2),
-                    child: MouseRegion(
-                      cursor: SystemMouseCursors.click,
+                  child: HoverRegion(
+                    builder: (context, ref, hovered) => GestureDetector(
+                      onTap: () => onTap(item.$2),
                       child: Text(
                         item.$1,
                         style: Theme.of(context)
                             .textTheme
                             .labelMedium
                             ?.copyWith(
-                              color: isActive ? accentColor : textColor,
+                              color: isActive || hovered
+                                  ? accentColor
+                                  : context.secondaryText,
                               letterSpacing: 1.5,
                               fontWeight:
                                   isActive ? FontWeight.w600 : FontWeight.w400,
@@ -94,66 +92,52 @@ class PortfolioNavBar extends ConsumerWidget {
 
           // Theme toggle
           const SizedBox(width: 24),
-          _ThemeToggle(isDark: isDark),
+          const _ThemeToggle(),
         ],
       ),
     );
   }
 }
 
-class _ThemeToggle extends ConsumerStatefulWidget {
-  const _ThemeToggle({required this.isDark});
-  final bool isDark;
+// ── Theme toggle — hover via HoverRegion, zero setState ──────────────────────
+
+class _ThemeToggle extends ConsumerWidget {
+  const _ThemeToggle();
 
   @override
-  ConsumerState<_ThemeToggle> createState() => _ThemeToggleState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = context.isDark;
+    final accent = context.accentColor;
 
-class _ThemeToggleState extends ConsumerState<_ThemeToggle> {
-  bool _hovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = widget.isDark;
-    final accentColor = isDark ? AppColors.accentDark : AppColors.accent;
-    final borderColor = isDark ? AppColors.border : AppColors.lightBorder;
-    final iconColor = _hovered
-        ? accentColor
-        : (isDark ? AppColors.textSecondary : AppColors.lightTextSecondary);
-
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: () => ref.read(themeNotifierProvider.notifier).toggle(),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: _hovered
-                ? (isDark
-                    ? AppColors.surfaceElevated
-                    : AppColors.lightSurfaceElevated)
-                : Colors.transparent,
-            border: Border.all(
-              color: _hovered ? accentColor : borderColor,
+    return HoverRegion(
+      builder: (context, ref, hovered) {
+        return GestureDetector(
+          onTap: () => ref.read(themeNotifierProvider.notifier).toggle(),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color:
+                  hovered ? context.surfaceElevatedColor : Colors.transparent,
+              border: Border.all(
+                color: hovered ? accent : context.borderColor,
+              ),
+              borderRadius: BorderRadius.circular(6),
             ),
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250),
-            transitionBuilder: (child, anim) =>
-                RotationTransition(turns: anim, child: child),
-            child: Icon(
-              isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-              key: ValueKey(isDark),
-              size: 16,
-              color: iconColor,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              transitionBuilder: (child, anim) =>
+                  RotationTransition(turns: anim, child: child),
+              child: Icon(
+                isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                key: ValueKey(isDark),
+                size: 16,
+                color: hovered ? accent : context.secondaryText,
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

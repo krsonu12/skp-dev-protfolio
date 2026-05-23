@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/theme_ext.dart';
 import '../../../domain/entities/experience_entity.dart';
 import '../../widgets/animated_section.dart';
+import '../../widgets/hover_region.dart';
 import '../../widgets/section_label.dart';
 
 class ExperienceSection extends StatelessWidget {
@@ -37,65 +38,64 @@ class ExperienceSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 64),
-          ...experiences.asMap().entries.map((entry) => AnimatedSection(
-                key: ValueKey('exp-${entry.key}'),
-                child: _ExperienceCard(
-                  experience: entry.value,
-                  isNarrow: isNarrow,
+          ...experiences.asMap().entries.map(
+                (entry) => AnimatedSection(
+                  key: ValueKey('exp-${entry.key}'),
+                  child: _ExperienceCard(
+                    experience: entry.value,
+                    isNarrow: isNarrow,
+                  ),
                 ),
-              )),
+              ),
         ],
       ),
     );
   }
 }
 
-class _ExperienceCard extends StatefulWidget {
-  const _ExperienceCard({required this.experience, required this.isNarrow});
+// ── Card — hover via HoverRegion, zero setState ───────────────────────────────
+
+class _ExperienceCard extends StatelessWidget {
+  const _ExperienceCard({
+    required this.experience,
+    required this.isNarrow,
+  });
 
   final ExperienceEntity experience;
   final bool isNarrow;
 
   @override
-  State<_ExperienceCard> createState() => _ExperienceCardState();
-}
-
-class _ExperienceCardState extends State<_ExperienceCard> {
-  bool _hovered = false;
-
-  @override
   Widget build(BuildContext context) {
-    final exp = widget.experience;
-
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.only(bottom: 2),
-        padding: const EdgeInsets.all(32),
-        decoration: BoxDecoration(
-          color: _hovered ? context.surfaceElevatedColor : Colors.transparent,
-          border: Border.all(
-            color: _hovered ? context.borderColor : Colors.transparent,
+    return HoverRegion(
+      cursor: MouseCursor.defer,
+      builder: (context, ref, hovered) {
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.only(bottom: 2),
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: hovered ? context.surfaceElevatedColor : Colors.transparent,
+            border: Border.all(
+              color: hovered ? context.borderColor : Colors.transparent,
+            ),
+            borderRadius: BorderRadius.circular(8),
           ),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: widget.isNarrow
-            ? _buildNarrow(context, exp)
-            : _buildWide(context, exp),
-      ),
+          child: isNarrow
+              ? _buildNarrow(context, hovered)
+              : _buildWide(context, hovered),
+        );
+      },
     );
   }
 
-  Widget _buildWide(BuildContext context, ExperienceEntity exp) {
+  Widget _buildWide(BuildContext context, bool hovered) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
           width: 180,
           child: Text(
-            exp.period,
+            experience.period,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: context.mutedText,
                   letterSpacing: 0.5,
@@ -103,59 +103,59 @@ class _ExperienceCardState extends State<_ExperienceCard> {
           ),
         ),
         const SizedBox(width: 40),
-        Expanded(child: _buildContent(context, exp)),
+        Expanded(child: _buildContent(context, hovered)),
       ],
     );
   }
 
-  Widget _buildNarrow(BuildContext context, ExperienceEntity exp) {
+  Widget _buildNarrow(BuildContext context, bool hovered) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          exp.period,
+          experience.period,
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: context.mutedText,
                 letterSpacing: 0.5,
               ),
         ),
         const SizedBox(height: 12),
-        _buildContent(context, exp),
+        _buildContent(context, hovered),
       ],
     );
   }
 
-  Widget _buildContent(BuildContext context, ExperienceEntity exp) {
+  Widget _buildContent(BuildContext context, bool hovered) {
     final accent = context.accentColor;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          exp.role,
+          experience.role,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: _hovered ? accent : context.primaryText,
+                color: hovered ? accent : context.primaryText,
               ),
         ),
         const SizedBox(height: 4),
         Row(
           children: [
             Text(
-              exp.company,
+              experience.company,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.secondaryText,
                     fontWeight: FontWeight.w500,
                   ),
             ),
             Text(
-              ' · ${exp.location}',
+              ' · ${experience.location}',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.mutedText,
                   ),
             ),
           ],
         ),
-        if (exp.projectName != null) ...[
+        if (experience.projectName != null) ...[
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -164,7 +164,7 @@ class _ExperienceCardState extends State<_ExperienceCard> {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
-              exp.projectName!,
+              experience.projectName!,
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     color: context.tagTextColor,
                     letterSpacing: 0.3,
@@ -173,7 +173,7 @@ class _ExperienceCardState extends State<_ExperienceCard> {
           ),
         ],
         const SizedBox(height: 20),
-        ...exp.bullets.map(
+        ...experience.bullets.map(
           (b) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: Row(
@@ -191,7 +191,10 @@ class _ExperienceCardState extends State<_ExperienceCard> {
                   ),
                 ),
                 Expanded(
-                  child: Text(b, style: Theme.of(context).textTheme.bodyMedium),
+                  child: Text(
+                    b,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ),
               ],
             ),
