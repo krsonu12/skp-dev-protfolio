@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_ext.dart';
 import '../../../../core/theme/theme_notifier.dart';
 import 'hover_region.dart';
+import 'profile_avatar.dart';
 
 class PortfolioNavBar extends ConsumerWidget {
   const PortfolioNavBar({
@@ -41,21 +42,38 @@ class PortfolioNavBar extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
       child: Row(
         children: [
-          // Logo
-          HoverRegion(
-            builder: (context, ref, hovered) => GestureDetector(
-              onTap: () => onTap(-1),
-              child: Text(
-                'Sonu Kumar Paswan',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: hovered
-                          ? accentColor.withValues(alpha: 0.7)
-                          : accentColor,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 2,
-                    ),
+          const ProfileAvatar(
+            radius: 24,
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HoverRegion(
+                builder: (context, ref, hovered) => GestureDetector(
+                  onTap: () => onTap(-1),
+                  child: Text(
+                    'Sonu Kumar Paswan',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: hovered
+                              ? accentColor.withValues(alpha: 0.7)
+                              : accentColor,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 2,
+                        ),
+                  ),
+                ),
               ),
-            ),
+              Text(
+                'Senior Flutter Developer',
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: context.tagTextColor,
+                      letterSpacing: 0.3,
+                    ),
+              )
+            ],
           ),
 
           const Spacer(),

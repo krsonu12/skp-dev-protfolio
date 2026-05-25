@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import '../../domain/entities/experience_entity.dart';
 import '../../domain/entities/portfolio_entity.dart';
 import '../../domain/entities/project_entity.dart';
@@ -75,7 +74,7 @@ class PortfolioLocalDataSource {
   // ── Projects ───────────────────────────────────────────────────────────────
   static const List<ProjectEntity> _projects = [
     ProjectEntity(
-      icon: Icons.label_outline,
+      iconKey: 'label_outline',
       title: 'White-Label Community Platform SDK',
       description:
           'A multi-tenant SDK enabling 10+ client brands to ship customized community apps from a single Flutter codebase.',
@@ -87,7 +86,7 @@ class PortfolioLocalDataSource {
       ],
     ),
     ProjectEntity(
-      icon: Icons.local_hospital_outlined,
+      iconKey: 'local_hospital_outlined',
       title: 'AI-Powered Healthcare Document Reader',
       description:
           'Flutter app integrating AWS Textract + NLP models for automated healthcare form extraction and patient auto-enrollment.',
@@ -99,7 +98,7 @@ class PortfolioLocalDataSource {
       ],
     ),
     ProjectEntity(
-      icon: Icons.local_shipping_outlined,
+      iconKey: 'local_shipping_outlined',
       title: 'Multi-Modal Logistics Scanner App',
       description:
           'Production logistics app for multi-modal transport with real-time tracking, QR/barcode scanning, and CI/CD automation.',
@@ -112,7 +111,7 @@ class PortfolioLocalDataSource {
       storeRating: '4.5+',
     ),
     ProjectEntity(
-      icon: Icons.shopping_cart_outlined,
+      iconKey: 'shopping_cart_outlined',
       title: 'Food-Tech & E-Commerce Suite',
       description:
           'Suite of 5+ production apps across food-tech and e-commerce with cart, checkout, loyalty rewards, and payment integrations.',
@@ -129,84 +128,84 @@ class PortfolioLocalDataSource {
   static const List<SkillCategoryEntity> _skillCategories = [
     SkillCategoryEntity(
       category: 'Architecture',
-      icon: Icons.account_tree_outlined,
+      iconKey: 'account_tree_outlined',
       skills: [
         'Clean Architecture',
         'Feature-First Modularization',
         'Domain-Driven Design',
         'SOLID + OOPs',
-        'Melos Monorepo',
+        'Melos Monorepo'
       ],
     ),
     SkillCategoryEntity(
       category: 'State Management',
-      icon: Icons.bolt_outlined,
+      iconKey: 'bolt_outlined',
       skills: ['BLoC', 'MobX + GetIt', 'Riverpod', 'Provider', 'GetX'],
     ),
     SkillCategoryEntity(
       category: 'Networking',
-      icon: Icons.language_outlined,
+      iconKey: 'language_outlined',
       skills: [
         'REST APIs',
         'Dio + Retrofit',
         'Freezed / json_serializable',
         'GraphQL basics',
-        'Interceptors & Retry',
+        'Interceptors & Retry'
       ],
     ),
     SkillCategoryEntity(
       category: 'Backend / Cloud',
-      icon: Icons.cloud_outlined,
+      iconKey: 'cloud_outlined',
       skills: [
         'Firebase (Firestore, Auth, FCM, Crashlytics)',
         'Supabase',
         'AWS Textract',
         'AWS SageMaker',
-        'AWS S3',
+        'AWS S3'
       ],
     ),
     SkillCategoryEntity(
       category: 'CI/CD & DevOps',
-      icon: Icons.rocket_launch_outlined,
+      iconKey: 'rocket_launch_outlined',
       skills: [
         'GitHub Actions',
         'Codemagic',
         'Fastlane',
         'Firebase App Distribution',
-        'Play Console / TestFlight',
+        'Play Console / TestFlight'
       ],
     ),
     SkillCategoryEntity(
       category: 'Testing',
-      icon: Icons.science_outlined,
+      iconKey: 'science_outlined',
       skills: [
         'Unit & Widget Tests',
         'Integration Tests',
         'flutter_test',
         'mockito / bloc_test',
-        'integration_test',
+        'integration_test'
       ],
     ),
     SkillCategoryEntity(
       category: 'Data & Storage',
-      icon: Icons.storage_outlined,
+      iconKey: 'storage_outlined',
       skills: [
         'Hive',
         'SQLite (sqflite)',
         'SharedPreferences',
         'Secure Storage',
-        'File System',
+        'File System'
       ],
     ),
     SkillCategoryEntity(
       category: 'Tooling',
-      icon: Icons.build_outlined,
+      iconKey: 'build_outlined',
       skills: [
         'Flutter & Dart',
         'Git / GitHub / GitLab',
         'Figma',
         'VS Code / Android Studio',
-        'Postman / Swagger',
+        'Postman / Swagger'
       ],
     ),
   ];

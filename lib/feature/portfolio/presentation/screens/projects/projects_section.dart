@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/theme/theme_ext.dart';
 import '../../../domain/entities/project_entity.dart';
+import '../../shared_providers/icon_resolver.dart';
 import '../../widgets/animated_section.dart';
 import '../../widgets/hover_region.dart';
 import '../../widgets/section_label.dart';
@@ -98,7 +99,8 @@ class _ProjectCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(
-            child: Icon(project.icon, color: context.accentColor, size: 24),
+            child: Icon(IconResolver.resolve(project.iconKey),
+                color: context.accentColor, size: 24),
           ),
         ),
         const SizedBox(width: 32),
@@ -113,7 +115,8 @@ class _ProjectCard extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(project.icon, color: context.accentColor, size: 24),
+            Icon(IconResolver.resolve(project.iconKey),
+                color: context.accentColor, size: 24),
             const SizedBox(width: 12),
             Expanded(
               child: Text(

@@ -21,7 +21,7 @@ class _PortfolioAppState extends ConsumerState<PortfolioApp> {
             ThemeMode.dark;
 
     return MaterialApp.router(
-      title: 'Sonu Kumar Paswan — Senior Flutter Developer',
+      title: 'Sonu Kumar Paswan — Portfolio',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),

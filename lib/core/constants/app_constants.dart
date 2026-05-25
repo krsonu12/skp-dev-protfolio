@@ -16,6 +16,9 @@ class AppConstants {
   static const String crashFreeRate = '<0.1%';
   static const String appsShipped = '10+';
 
+  // Assets
+  static const String profileImage = 'assets/images/profile.png';
+
   // Summary
   static const String summary =
       'Senior Flutter Developer with 5+ years of end-to-end ownership over '

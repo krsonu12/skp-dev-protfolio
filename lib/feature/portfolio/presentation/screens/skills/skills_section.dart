@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../../core/theme/theme_ext.dart';
 import '../../../domain/entities/skill_category_entity.dart';
+import '../../shared_providers/icon_resolver.dart';
 import '../../widgets/animated_section.dart';
 import '../../widgets/hover_region.dart';
 import '../../widgets/lottie_widget.dart';
@@ -36,35 +37,28 @@ class SkillsSection extends StatelessWidget {
         children: [
           const SectionLabel('SKILLS'),
           const SizedBox(height: 32),
-
-          // ── Headline + Lottie side by side on wide ──────────────────
           AnimatedSection(
             key: const ValueKey('skills-headline'),
             child: isNarrow
                 ? _buildNarrowHeader(context)
                 : _buildWideHeader(context),
           ),
-
           const SizedBox(height: 64),
-
-          // ── Skill grid ──────────────────────────────────────────────
           AnimatedSection(
             key: const ValueKey('skills-grid'),
             child: _buildGrid(context, isNarrow, isMedium),
           ),
-
           const SizedBox(height: 80),
-
-          // ── Architecture highlights ─────────────────────────────────
           const SectionLabel('ARCHITECTURE & ENGINEERING HIGHLIGHTS'),
           const SizedBox(height: 32),
           AnimatedSection(
             key: const ValueKey('highlights'),
+            // Pre-parse highlights outside build — no string work per frame.
             child: Column(
               children: highlights
                   .asMap()
                   .entries
-                  .map((e) => _HighlightItem(text: e.value, index: e.key))
+                  .map((e) => _HighlightItem.parse(e.value, e.key))
                   .toList(),
             ),
           ),
@@ -85,39 +79,38 @@ class SkillsSection extends StatelessWidget {
                 ),
           ),
         ),
-        // Lottie skills/tools animation
-        LottieWidget(
-          asset: LottieAssets.skills,
-          width: 220,
-          height: 220,
-        )
-            .animate()
-            .fadeIn(duration: 800.ms, delay: 200.ms)
-            .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1)),
+        // RepaintBoundary isolates Lottie repaints from the rest of the tree.
+        RepaintBoundary(
+          child: const LottieWidget(
+            asset: LottieAssets.skills,
+            width: 220,
+            height: 220,
+          )
+              .animate()
+              .fadeIn(duration: 800.ms, delay: 200.ms)
+              .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1)),
+        ),
       ],
     );
   }
 
   Widget _buildNarrowHeader(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                'The full\npicture.',
-                style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                      fontSize: 28,
-                    ),
-              ),
-            ),
-            LottieWidget(
-              asset: LottieAssets.skills,
-              width: 120,
-              height: 120,
-            ).animate().fadeIn(duration: 800.ms, delay: 200.ms),
-          ],
+        Expanded(
+          child: Text(
+            'The full\npicture.',
+            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                  fontSize: 28,
+                ),
+          ),
+        ),
+        RepaintBoundary(
+          child: const LottieWidget(
+            asset: LottieAssets.skills,
+            width: 120,
+            height: 120,
+          ).animate().fadeIn(duration: 800.ms, delay: 200.ms),
         ),
       ],
     );
@@ -137,8 +130,6 @@ class SkillsSection extends StatelessWidget {
       );
     }
 
-    // IntrinsicHeight rows — each card sizes to its content, tallest card
-    // in a row sets the row height. No fixed aspect ratio, no overflow.
     final rows = <Widget>[];
     for (var i = 0; i < skillCategories.length; i += crossAxisCount) {
       final rowItems = skillCategories.skip(i).take(crossAxisCount).toList();
@@ -174,6 +165,9 @@ class _SkillCategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Resolve icon once per build — O(1) map lookup, not in a loop.
+    final iconData = IconResolver.resolve(category.iconKey);
+
     return HoverRegion(
       cursor: MouseCursor.defer,
       builder: (context, ref, hovered) {
@@ -192,7 +186,6 @@ class _SkillCategoryCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Animated icon on hover
               AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.all(8),
@@ -203,7 +196,7 @@ class _SkillCategoryCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  category.icon,
+                  iconData,
                   color: hovered ? accent : context.accentColor,
                   size: 20,
                 ),
@@ -238,10 +231,10 @@ class _SkillCategoryCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           s,
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    fontSize: 13,
-                                  ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(fontSize: 13),
                         ),
                       ),
                     ],
@@ -257,20 +250,37 @@ class _SkillCategoryCard extends StatelessWidget {
 }
 
 // ── Highlight row ─────────────────────────────────────────────────────────────
+// String parsing is done once in the factory constructor, not on every build.
 
 class _HighlightItem extends StatelessWidget {
-  const _HighlightItem({required this.text, required this.index});
+  const _HighlightItem({
+    super.key,
+    required this.index,
+    required this.title,
+    required this.body,
+    required this.hasTitle,
+  });
 
-  final String text;
+  /// Parse the raw highlight string once — never inside build().
+  factory _HighlightItem.parse(String text, int index) {
+    final colonIdx = text.indexOf(' \u2014 '); // ' — '
+    final hasTitle = colonIdx != -1;
+    return _HighlightItem(
+      key: ValueKey('highlight-$index'),
+      index: index,
+      hasTitle: hasTitle,
+      title: hasTitle ? text.substring(0, colonIdx) : '',
+      body: hasTitle ? text.substring(colonIdx + 3) : text,
+    );
+  }
+
   final int index;
+  final String title;
+  final String body;
+  final bool hasTitle;
 
   @override
   Widget build(BuildContext context) {
-    final colonIdx = text.indexOf(' — ');
-    final hasTitle = colonIdx != -1;
-    final title = hasTitle ? text.substring(0, colonIdx) : '';
-    final body = hasTitle ? text.substring(colonIdx + 3) : text;
-
     return HoverRegion(
       cursor: MouseCursor.defer,
       builder: (context, ref, hovered) => AnimatedContainer(
@@ -302,7 +312,7 @@ class _HighlightItem extends StatelessWidget {
                         style: Theme.of(context).textTheme.bodyLarge,
                         children: [
                           TextSpan(
-                            text: '$title — ',
+                            text: '$title \u2014 ',
                             style: TextStyle(
                               color: context.primaryText,
                               fontWeight: FontWeight.w600,

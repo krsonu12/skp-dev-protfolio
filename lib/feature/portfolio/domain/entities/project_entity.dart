@@ -1,12 +1,13 @@
-import 'package:flutter/material.dart';
-
+// Domain layer — pure Dart, no Flutter imports.
+// IconData is a Flutter type; we store the codePoint + fontFamily instead
+// and resolve it in the presentation layer via ProjectIcon.resolve().
 class ProjectEntity {
   const ProjectEntity({
     required this.title,
     required this.description,
     required this.tags,
     required this.bullets,
-    this.icon = Icons.phone_android,
+    this.iconKey = 'phone_android',
     this.storeRating,
   });
 
@@ -14,6 +15,8 @@ class ProjectEntity {
   final String description;
   final List<String> tags;
   final List<String> bullets;
-  final IconData icon;
+
+  /// Logical icon key resolved by the presentation layer.
+  final String iconKey;
   final String? storeRating;
 }
